@@ -17,7 +17,7 @@ assertQueue(connexionEstablished, ($message) => {
 
   console.log($message)
 
-  weather.now($message.message, function (err, aData) {
+  weather.now($message.luis.entity, function (err, aData) {
     if (err) console.log(err)
     else {
       console.log(aData.getDegreeTemp())
