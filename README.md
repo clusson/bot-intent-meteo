@@ -4,5 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/clusson/bot-intent-meteo/badge.svg?branch=master)](https://coveralls.io/github/clusson/bot-intent-meteo?branch=master)
 
 `yarn install`
+
 `yarn build`
+
 `yarn start`
