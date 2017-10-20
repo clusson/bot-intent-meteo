@@ -1,17 +1,22 @@
-const exchange = process.env.RABBIT_EXCHANGE
-const apiKey = process.env.RABBIT_INTENT_API_BINDING
-const queue = process.env.RABBIT_INTENT_INSULTE_QUEUE
-const binding = process.env.RABBIT_INTENT_INSULTE_BINDING
-
+const getEnv = () => {
+    return {
+        exchange: process.env.RABBIT_EXCHANGE,
+        queue: process.env.RABBIT_INTENT_CHUCKNORRIS_QUEUE,
+        binding: process.env.RABBIT_INTENT_CHUCKNORRIS_BINDING,
+        apiKey: process.env.RABBIT_INTENT_API_BINDING
+    }
+}
 
 export const assertQueue = (connexion, callback) => {
+
+    const env = getEnv()
     connexion.then(conn => {
         conn.createChannel(function (err, ch) {
-            ch.assertExchange(exchange, 'topic', { durable: true })
-            ch.assertQueue(queue, { durable: false }, function (err, q) {
+            ch.assertExchange(env.exchange, 'topic', { durable: true })
+            ch.assertQueue(env.queue, { durable: false }, function (err, q) {
                 console.log(' [*] Waiting for logs. To exit press CTRL+C')
 
-                ch.bindQueue(q.queue, exchange, binding)
+                ch.bindQueue(q.queue, env.exchange, env.binding)
                 ch.consume(q.queue, function (msg) {
                     callback(JSON.parse(msg.content.toString()))
                 }, { noAck: true })
@@ -21,12 +26,13 @@ export const assertQueue = (connexion, callback) => {
 }
 
 export const sendTo = (connexion, message) => {
+
+    const env = getEnv()
     connexion.then(conn => {
         conn.createChannel(function (err, ch) {
-            ch.assertExchange(exchange, 'topic', { durable: true })
-
-            ch.publish(exchange, apiKey, new Buffer(message))
-            console.log(' [x] Sent %s:\'%s\'', apiKey, message)
+            ch.assertExchange(env.exchange, 'topic', { durable: true })
+            ch.publish(env.exchange, env.apiKey, new Buffer(message))
+            console.log(' [x] Sent %s:\'%s\'', env.apiKey, message)
         })
     })
 }
