@@ -5,8 +5,5 @@ import { logic } from './logic'
 const connexionEstablished = connexion()
 
 assertQueue(connexionEstablished, ($message) => {
-  // logic($message.luis.entity).then(response => {
-
   sendTo(connexionEstablished, JSON.stringify($message))
-  // })
 })  

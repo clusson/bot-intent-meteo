@@ -1,8 +1,8 @@
 const getEnv = () => {
     return {
         exchange: process.env.RABBIT_EXCHANGE,
-        queue: process.env.RABBIT_INTENT_CHUCKNORRIS_QUEUE,
-        binding: process.env.RABBIT_INTENT_CHUCKNORRIS_BINDING,
+        queue: process.env.RABBIT_INTENT_METEO_QUEUE,
+        binding: process.env.RABBIT_INTENT_METEO_BINDING,
         apiKey: process.env.RABBIT_INTENT_API_BINDING
     }
 }

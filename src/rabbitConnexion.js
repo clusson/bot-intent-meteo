@@ -9,9 +9,9 @@ export const connexion = () => {
     const URL = 'amqp://' + user + ':' + password + '@' + host + ':' + port
     amqp.connect(URL, function (err, conn) {
       if (err) {
-        reject(new Error('Connection refusée'))
+        return reject(new Error('Connection refusée'))
       }
-      resolve(conn)
+      return resolve(conn)
     })
   })
 }

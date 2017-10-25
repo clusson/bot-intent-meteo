@@ -516,10 +516,11 @@ function safeToString(obj) {
 }
 
 function isError(obj) {
-    return obj !== null &&
+    return obj instanceof Error ||
+        (obj !== null &&
            typeof obj === "object" &&
            typeof obj.message === "string" &&
-           typeof obj.name === "string";
+           typeof obj.name === "string");
 }
 
 function markAsOriginatingFromRejection(e) {
@@ -24835,51 +24836,57 @@ module.exports = bytesToUuid;
 
 /***/ }),
 /* 109 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__rabbitConnexion__ = __webpack_require__(110);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rabbitUtils__ = __webpack_require__(163);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__logic__ = __webpack_require__(164);
 
 
+var _rabbitConnexion = __webpack_require__(110);
 
+var _rabbitUtils = __webpack_require__(163);
 
-const connexionEstablished = Object(__WEBPACK_IMPORTED_MODULE_0__rabbitConnexion__["a" /* connexion */])();
+var _logic = __webpack_require__(164);
 
-Object(__WEBPACK_IMPORTED_MODULE_1__rabbitUtils__["a" /* assertQueue */])(connexionEstablished, $message => {
-  Object(__WEBPACK_IMPORTED_MODULE_2__logic__["a" /* logic */])($message.luis.entity).then(response => {
-    Object(__WEBPACK_IMPORTED_MODULE_1__rabbitUtils__["b" /* sendTo */])(connexionEstablished, JSON.stringify(response));
-  });
+var connexionEstablished = (0, _rabbitConnexion.connexion)();
+
+(0, _rabbitUtils.assertQueue)(connexionEstablished, function ($message) {
+  (0, _rabbitUtils.sendTo)(connexionEstablished, JSON.stringify($message));
 });
 
 /***/ }),
 /* 110 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_amqplib_callback_api__ = __webpack_require__(111);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_amqplib_callback_api___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_amqplib_callback_api__);
 
-const user = process.env.RABBIT_USER;
-const host = process.env.RABBIT_HOST;
-const port = process.env.RABBIT_PORT;
-const password = process.env.RABBIT_PASSWORD;
 
-const connexion = () => {
-  return new Promise((resolve, reject) => {
-    const URL = 'amqp://' + user + ':' + password + '@' + host + ':' + port;
-    __WEBPACK_IMPORTED_MODULE_0_amqplib_callback_api___default.a.connect(URL, function (err, conn) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.connexion = undefined;
+
+var _callback_api = __webpack_require__(111);
+
+var _callback_api2 = _interopRequireDefault(_callback_api);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var user = process.env.RABBIT_USER;
+var host = process.env.RABBIT_HOST;
+var port = process.env.RABBIT_PORT;
+var password = process.env.RABBIT_PASSWORD;
+
+var connexion = exports.connexion = function connexion() {
+  return new Promise(function (resolve, reject) {
+    var URL = 'amqp://' + user + ':' + password + '@' + host + ':' + port;
+    _callback_api2.default.connect(URL, function (err, conn) {
       if (err) {
-        reject(new Error('Connection refusée'));
+        return reject(new Error('Connection refusée'));
       }
-      resolve(conn);
+      return resolve(conn);
     });
   });
 };
-/* harmony export (immutable) */ __webpack_exports__["a"] = connexion;
-
 
 /***/ }),
 /* 111 */
@@ -30577,7 +30584,7 @@ __webpack_require__(145)(Promise);
 __webpack_require__(146)(
     Promise, PromiseArray, tryConvertToPromise, INTERNAL, async, getDomain);
 Promise.Promise = Promise;
-Promise.version = "3.5.0";
+Promise.version = "3.5.1";
 __webpack_require__(147)(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
 __webpack_require__(148)(Promise);
 __webpack_require__(149)(Promise, apiRejection, tryConvertToPromise, createContext, INTERNAL, debug);
@@ -31341,7 +31348,10 @@ Promise.prototype.suppressUnhandledRejections = function() {
 Promise.prototype._ensurePossibleRejectionHandled = function () {
     if ((this._bitField & 524288) !== 0) return;
     this._setRejectionIsUnhandled();
-    async.invokeLater(this._notifyUnhandledRejection, this, undefined);
+    var self = this;
+    setTimeout(function() {
+        self._notifyUnhandledRejection();
+    }, 1);
 };
 
 Promise.prototype._notifyUnhandledRejectionIsHandled = function () {
@@ -35206,22 +35216,27 @@ module.exports = Object.freeze(Args);
 
 /***/ }),
 /* 163 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-const getEnv = () => {
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var getEnv = function getEnv() {
     return {
         exchange: process.env.RABBIT_EXCHANGE,
-        queue: process.env.RABBIT_INTENT_CHUCKNORRIS_QUEUE,
-        binding: process.env.RABBIT_INTENT_CHUCKNORRIS_BINDING,
+        queue: process.env.RABBIT_INTENT_METEO_QUEUE,
+        binding: process.env.RABBIT_INTENT_METEO_BINDING,
         apiKey: process.env.RABBIT_INTENT_API_BINDING
     };
 };
 
-const assertQueue = (connexion, callback) => {
+var assertQueue = exports.assertQueue = function assertQueue(connexion, callback) {
 
-    const env = getEnv();
-    connexion.then(conn => {
+    var env = getEnv();
+    connexion.then(function (conn) {
         conn.createChannel(function (err, ch) {
             ch.assertExchange(env.exchange, 'topic', { durable: true });
             ch.assertQueue(env.queue, { durable: false }, function (err, q) {
@@ -35235,13 +35250,11 @@ const assertQueue = (connexion, callback) => {
         });
     });
 };
-/* harmony export (immutable) */ __webpack_exports__["a"] = assertQueue;
 
+var sendTo = exports.sendTo = function sendTo(connexion, message) {
 
-const sendTo = (connexion, message) => {
-
-    const env = getEnv();
-    connexion.then(conn => {
+    var env = getEnv();
+    connexion.then(function (conn) {
         conn.createChannel(function (err, ch) {
             ch.assertExchange(env.exchange, 'topic', { durable: true });
             ch.publish(env.exchange, env.apiKey, new Buffer(message));
@@ -35249,37 +35262,52 @@ const sendTo = (connexion, message) => {
         });
     });
 };
-/* harmony export (immutable) */ __webpack_exports__["b"] = sendTo;
-
 
 /***/ }),
 /* 164 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_request__ = __webpack_require__(165);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_request___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_request__);
 
 
-const logic = $message => {
-    return new Promise((resolve, reject) => {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.logic = undefined;
+
+var _request = __webpack_require__(165);
+
+var _request2 = _interopRequireDefault(_request);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var logic = exports.logic = function logic($message) {
+    return new Promise(function (resolve, reject) {
+        if ($message.luis.entities.lenght === 0 && !$message.luis.entities[0].type) {
+            var newMessage = Object.assign($message.message, { content: 'Je n\'ai pas réussi à trouver votre ville' });
+            resolve(Object.assign($message, { message: newMessage }));
+        }
+
         var options = {
             method: 'GET',
-            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + $message + ',fr&appid=' + process.env.OPEN_WEATHER_API_KEY
+            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + $message.luis.entities.entity + ',fr&appid=' + process.env.OPEN_WEATHER_API_KEY
         };
 
-        __WEBPACK_IMPORTED_MODULE_0_request___default()(options, function (error, response, body) {
-            if (error) throw new Error(error);
-            let jsonData = JSON.parse(body);
-            let reponse = jsonData[0].main.temp;
-            const newMessage = Object.assign($message.message, { content: response });
-            const newIntentMessage = Object.assign($message, { message: newMessage });
-            resolve(newIntentMessage);
+        (0, _request2.default)(options, function (error, response, body) {
+            if (error) {
+                var _newMessage = Object.assign($message.message, { content: "J'ai eu un problème quand j'ai voulu récupéré les données ..." });
+                resolve(Object.assign($message, { message: _newMessage }));
+            }
+
+            var jsonData = JSON.parse(body);
+            console.log('result' + jsonData);
+            var meteo = 'Voici la météo pour ' + jsonData.main.temp;
+
+            var newMessage = Object.assign($message.message, { content: meteo });
+            resolve(Object.assign($message, { message: newMessage }));
         });
     });
 };
-/* harmony export (immutable) */ __webpack_exports__["a"] = logic;
-
 
 /***/ }),
 /* 165 */

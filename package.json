@@ -6,7 +6,7 @@
   "scripts": {
     "watch": "webpack --progress --colors --watch --config webpack.config.js",
     "build": "webpack --progress --colors --config webpack.config.js",
-    "start": "node dist/bundle.js",
+    "start": "nodemon dist/bundle.js",
     "test": "nyc ava"
   },
   "ava": {
