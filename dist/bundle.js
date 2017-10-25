@@ -35302,8 +35302,10 @@ var logic = exports.logic = function logic($message) {
             }
 
             var jsonData = JSON.parse(body);
+            //Kelvin to celsuis
+            var degrees = jsonData.main.temp - 273.15;
             console.log('result' + jsonData);
-            var meteo = 'Voici la météo pour ' + jsonData.main.temp;
+            var meteo = 'Voici la météo pour ' + degrees;
 
             var newMessage = Object.assign($message.message, { content: meteo });
             resolve(Object.assign($message, { message: newMessage }));

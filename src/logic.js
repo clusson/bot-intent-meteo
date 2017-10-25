@@ -20,8 +20,10 @@ export const logic = ($message) => {
             }
 
             let jsonData = JSON.parse(body)
+            //Kelvin to celsuis
+            let degrees = jsonData.main.temp - 273.15
             console.log('result' + jsonData)
-            let meteo = 'Voici la météo pour ' + jsonData.main.temp
+            let meteo = 'Voici la météo pour ' + degrees
 
             const newMessage = Object.assign($message.message, { content: meteo })
             resolve(Object.assign($message, { message: newMessage }))
