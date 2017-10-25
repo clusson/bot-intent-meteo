@@ -24850,7 +24850,9 @@ var _logic = __webpack_require__(164);
 var connexionEstablished = (0, _rabbitConnexion.connexion)();
 
 (0, _rabbitUtils.assertQueue)(connexionEstablished, function ($message) {
-  (0, _rabbitUtils.sendTo)(connexionEstablished, JSON.stringify($message));
+  (0, _logic.logic)($message).then(function (response) {
+    (0, _rabbitUtils.sendTo)(connexionEstablished, JSON.stringify(response));
+  });
 });
 
 /***/ }),
