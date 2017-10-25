@@ -35285,27 +35285,31 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var logic = exports.logic = function logic($message) {
     return new Promise(function (resolve, reject) {
-        if ($message.luis.entities.lenght === 0 && !$message.luis.entities[0].type) {
-            var newMessage = Object.assign($message.message, { content: 'Je n\'ai pas réussi à trouver votre ville' });
+
+        if ($message.luis.entities.length === 0) {
+            var newMessage = Object.assign($message.message, { content: 'Désolé ! Je n\'ai pas réussi à trouver votre ville' });
             resolve(Object.assign($message, { message: newMessage }));
+            return;
         }
 
         var options = {
             method: 'GET',
-            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + $message.luis.entities.entity + ',fr&appid=' + process.env.OPEN_WEATHER_API_KEY
+            url: 'https://api.openweathermap.org/data/2.5/weather?q=' + $message.luis.entities[0].entity + ',fr&units=metric&appid=' + process.env.OPEN_WEATHER_API_KEY
         };
 
         (0, _request2.default)(options, function (error, response, body) {
             if (error) {
-                var _newMessage = Object.assign($message.message, { content: "J'ai eu un problème quand j'ai voulu récupéré les données ..." });
+                var _newMessage = Object.assign($message.message, { content: "Désolé ! J'ai eu un problème quand j'ai voulu récupérer les données ..." });
                 resolve(Object.assign($message, { message: _newMessage }));
             }
 
             var jsonData = JSON.parse(body);
-            //Kelvin to celsuis
-            var degrees = jsonData.main.temp - 273.15;
+            console.log(jsonData);
+            var city = jsonData.name;
+            var degrees = jsonData.main.temp;
+
             console.log('result' + jsonData);
-            var meteo = 'Voici la météo pour ' + degrees;
+            var meteo = 'Voici la météo pour ' + city + ' : ' + degrees + '°C';
 
             var newMessage = Object.assign($message.message, { content: meteo });
             resolve(Object.assign($message, { message: newMessage }));
